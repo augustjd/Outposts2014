@@ -13,6 +13,6 @@ public abstract class Player {
     
     public abstract void init() ;
     
-    public abstract movePair move(ArrayList<Pair> prarr, int noutpost); // positions of the rats
+    public abstract movePair move(ArrayList<Pair> prarr, int noutpost); // positions of all the outpost, playerid
 
 }

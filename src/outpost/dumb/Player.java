@@ -32,7 +32,7 @@ public class Player extends outpost.sim.Player {
 	@Override
 	public movePair move(ArrayList<Pair> prarr, int noutpost) {
 		//System.out.printf("paarr size and noutpost size is %d, %d", prarr.size(), noutpost);
-		if (prarr.size()<noutpost) {
+		if (prarr.size()>noutpost) {
 			movePair mpr = new movePair(0, new Pair(0,0), true);
 			return mpr;
 		}

@@ -21,12 +21,6 @@ import outpost.sim.Pair;
 import outpost.sim.Player;
 import outpost.sim.Point;
 
-enum PType {
-    PTYPE_MUSICPIPERS,
-    PTYPE_PIPERS,
-    PTYPE_RAT
-}
-
 public class Outpost
 {
     static String ROOT_DIR = "outpost";
@@ -320,7 +314,7 @@ public class Outpost
             else if (id == 2)
                 g2.setPaint(Color.BLACK);
             else if (id == 3)
-            	g2.setPaint(Color.CYAN);
+            	g2.setPaint(Color.red);
             
         	double x_in = (dimension*s-ox)/size;
             double y_in = (dimension*s-oy)/size;
@@ -338,11 +332,11 @@ public class Outpost
 
 
 
-    ArrayList<Pair> getClosestOutpost(Point pr) {
+    void updatePoint(Point pr) {
     
-        double mindist = size;
+        double mindist = Math.sqrt(size*size);
         
-        ArrayList<Pair> ownerlist = new ArrayList<Pair>();
+        //ArrayList<Pair> ownerlist = new ArrayList<Pair>();
        
        
         	for (int j =0 ; j<king_outpostlist.size(); j++) {
@@ -355,19 +349,19 @@ public class Outpost
         		}
         	}
         if (mindist < r_distance){
-        	ownerlist = pr.ownerlist;
-			ownerlist.clear();
+        	//ownerlist = pr.ownerlist;
+			//ownerlist.clear();
+        	pr.ownerlist.clear();
         	for (int j =0 ; j<king_outpostlist.size(); j++) {
         		for (int f =0; f<king_outpostlist.get(j).size(); f++) {
         			double d = distance(PairtoPoint(king_outpostlist.get(j).get(f)), pr);
         			if (d == mindist) {
         				Pair tmp = new Pair(j, f);
-        				ownerlist.add(tmp);
+        				pr.ownerlist.add(tmp);
         			}
         		}
         	}
         }
-        return ownerlist;
     }
 
 
@@ -400,7 +394,18 @@ public class Outpost
     		}
     	for (int i=0; i<4; i++) {
     		noutpost[i] = (int) Math.min(soil[i]/L, water[i]/W)+1;
-    		System.out.printf("After the calculation, the number of outpost for %d king should be %d\n", i, noutpost[i]);
+    		if (noutpost[i]>king_outpostlist.get(i).size()) {
+    			System.out.printf("After the calculation, the number of outpost for %d king should increase", i);
+            	if (i==0)
+            	king_outpostlist.get(i).add(new Pair(0,0));
+            	if (i==1)
+            		king_outpostlist.get(i).add(new Pair(size-1, 0));
+            	if (i==2)
+            		king_outpostlist.get(i).add(new Pair(size-1, size-1));
+            	if (i==3)
+            		king_outpostlist.get(i).add(new Pair(0,size-1));
+    		}
+    		
     	}
     	
     }
@@ -409,7 +414,7 @@ public class Outpost
     void updatemap() {
         for (int i=0; i<size; i++) {
         	for (int j=0; j<size; j++) {
-        	grid[i].ownerlist = getClosestOutpost(grid[i*size+j]);
+        	updatePoint(grid[i*size+j]);
         	}
         	}
     }
@@ -423,13 +428,13 @@ public class Outpost
     }
 
     boolean validateMove(movePair mpr, int id) {
-    	boolean right = false;
-    	if (king_outpostlist.get(id).size()>noutpost[id]) {
+    	reach = false;
+    	if (king_outpostlist.get(id).size()>noutpost[id] && (tick%10==1)) {
     		System.out.printf("%d 's king_outpostlist size is %d, noutpost size %d", id, king_outpostlist.get(id).size(), noutpost[id]);
     		if (mpr.delete && mpr.id < king_outpostlist.get(id).size())
-    			right = true;
+    			return true;
     	}
-    	else {
+    	else if (mpr.id<king_outpostlist.get(id).size()){
     		Pair current = king_outpostlist.get(id).get(mpr.id);
     		Pair next = mpr.pr;
     		boolean has = false;
@@ -454,7 +459,6 @@ public class Outpost
         if (id ==3) {
         	target = new Pair(0,size-1);
         }
-        reach = false;
         searchlist.clear();
         supplyline(next, target, id);
         
@@ -626,7 +630,7 @@ public class Outpost
         	// validate player move
             if (validateMove(next, d)) {
             	if (next.delete) {
-            		king_outpostlist.remove(next.id);
+            		king_outpostlist.get(d).remove(next.id);
             	}
             	else {
             		Pair tmp = new Pair(next.pr.x, next.pr.y);
