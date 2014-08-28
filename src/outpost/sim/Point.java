@@ -8,6 +8,7 @@ public class Point {
     public int x;
     public int y;
     public boolean water;
+    public double distance;
     //public int owner;
     public ArrayList<Pair> ownerlist = new ArrayList<Pair>();
 

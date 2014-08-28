@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import outpost.sim.Point;
 
 public abstract class Player {
-    public int id; 
+    public static int id; 
 
     public Pair[] outposts;
     
@@ -13,6 +13,6 @@ public abstract class Player {
     
     public abstract void init() ;
     
-    public abstract movePair move(ArrayList<Pair> prarr, int noutpost); // positions of all the outpost, playerid
+    public abstract movePair move(ArrayList<ArrayList<Pair>> king_outpostlist, int noutpost, Point[] grid); // positions of all the outpost, playerid
 
 }

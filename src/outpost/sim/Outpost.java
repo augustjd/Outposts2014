@@ -395,7 +395,7 @@ public class Outpost
     	for (int i=0; i<4; i++) {
     		noutpost[i] = (int) Math.min(soil[i]/L, water[i]/W)+1;
     		if (noutpost[i]>king_outpostlist.get(i).size()) {
-    			System.out.printf("After the calculation, the number of outpost for %d king should increase", i);
+    			//System.out.printf("After the calculation, the number of outpost for %d king should increase", i);
             	if (i==0)
             	king_outpostlist.get(i).add(new Pair(0,0));
             	if (i==1)
@@ -430,7 +430,7 @@ public class Outpost
     boolean validateMove(movePair mpr, int id) {
     	reach = false;
     	if (king_outpostlist.get(id).size()>noutpost[id] && (tick%10==1)) {
-    		System.out.printf("%d 's king_outpostlist size is %d, noutpost size %d", id, king_outpostlist.get(id).size(), noutpost[id]);
+    		//System.out.printf("%d 's king_outpostlist size is %d, noutpost size %d", id, king_outpostlist.get(id).size(), noutpost[id]);
     		if (mpr.delete && mpr.id < king_outpostlist.get(id).size())
     			return true;
     	}
@@ -443,7 +443,7 @@ public class Outpost
     				has = true;
     			}
     		}
-    		System.out.printf("surrand is %b\n",has);
+    		//System.out.printf("surrand is %b\n",has);
     		if (has && !PairtoPoint(next).water ) {
         Pair target = null ;
         
@@ -625,8 +625,8 @@ public class Outpost
         try {
         	movePair next = new movePair();
         	
-        	next = players[d].move(king_outpostlist.get(d), noutpost[d]);
-        	System.out.printf("Player %d is moving (%d, %d) to (%d, %d)\n", d, king_outpostlist.get(d).get(next.id).x, king_outpostlist.get(d).get(next.id).y, next.pr.x, next.pr.y);
+        	next = players[d].move(king_outpostlist, noutpost[d], grid);
+        	//System.out.printf("Player %d is moving (%d, %d) to (%d, %d)\n", d, king_outpostlist.get(d).get(next.id).x, king_outpostlist.get(d).get(next.id).y, next.pr.x, next.pr.y);
         	// validate player move
             if (validateMove(next, d)) {
             	if (next.delete) {
@@ -635,7 +635,7 @@ public class Outpost
             	else {
             		Pair tmp = new Pair(next.pr.x, next.pr.y);
             		king_outpostlist.get(d).set((next.id), tmp);
-            		System.out.printf("player %d 's king_outpostlist %d 's outpost is (%d, %d)\n", d, next.id, tmp.x, tmp.y);
+            	//	System.out.printf("player %d 's king_outpostlist %d 's outpost is (%d, %d)\n", d, next.id, tmp.x, tmp.y);
             	}
             	updatemap();
             }
@@ -727,9 +727,11 @@ public class Outpost
     	    	list.add(pr);
     	    	counter = counter +1;
     	    	grid[pr.x*size+pr.y].water = true;
-    	    	grid[pr.x*size+100-pr.y].water = true;
-    	    	grid[(100-pr.x)*size+pr.y].water = true;
-    	    	grid[(100-pr.x)*size+100-pr.y].water = true;
+    	    	grid[(size-pr.y)*size+pr.x].water = true;
+    	    	grid[(100-pr.x)*size+(100-pr.y)].water = true;
+    	    	grid[pr.y*size+100-pr.x].water = true;
+    	    	//grid[(100-pr.x)*size+pr.y].water = true;
+    	    	//grid[(100-pr.x)*size+100-pr.y].water = true;
     	    }
     	} catch (FileNotFoundException e) {
     	    e.printStackTrace();
@@ -743,7 +745,7 @@ public class Outpost
     	    } catch (IOException e) {
     	    }
     	}
-    	System.out.println(counter);
+    	//System.out.println(counter);
     }
 	public static void main(String[] args) throws Exception
 	{
