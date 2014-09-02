@@ -54,6 +54,7 @@ public class Outpost
     static double[] water = new double[4];
 	static double[] soil = new double[4];
 	static int[] noutpost = new int[4];
+	static int nrounds;
 	
 	ArrayList<ArrayList<Pair>> king_outpostlist = new ArrayList<ArrayList<Pair>>();
     
@@ -310,11 +311,11 @@ public class Outpost
         	if (id == 0) 
                 g2.setPaint(Color.WHITE);
             else if (id == 1)
-                g2.setPaint(Color.GREEN);
+                g2.setPaint(Color.MAGENTA);
             else if (id == 2)
                 g2.setPaint(Color.BLACK);
             else if (id == 3)
-            	g2.setPaint(Color.red);
+            	g2.setPaint(Color.RED);
             
         	double x_in = (dimension*s-ox)/size;
             double y_in = (dimension*s-oy)/size;
@@ -623,9 +624,12 @@ public class Outpost
        
 	for (int d=0; d<4; d++) {
         try {
+        	ArrayList<movePair> nextlist = new ArrayList<movePair>();
+        	nextlist = players[d].move(king_outpostlist, noutpost[d], grid);
+        	for (int i=0; i<nextlist.size(); i++) {
         	movePair next = new movePair();
-        	
-        	next = players[d].move(king_outpostlist, noutpost[d], grid);
+        	next = nextlist.get(i);
+        	//next = players[d].move(king_outpostlist, noutpost[d], grid);
         	//System.out.printf("Player %d is moving (%d, %d) to (%d, %d)\n", d, king_outpostlist.get(d).get(next.id).x, king_outpostlist.get(d).get(next.id).y, next.pr.x, next.pr.y);
         	// validate player move
             if (validateMove(next, d)) {
@@ -642,6 +646,7 @@ public class Outpost
             else {
             	System.out.println("valid didn't pass...");
             }
+        	}
             if (tick % 10 == 0){
             	calculateres();
             	//updatemap();
@@ -658,8 +663,14 @@ public class Outpost
             }
 */
         }
+	if (tick == nrounds) {
+		calculateres();
+		for (int i=0; i<4; i++) {
+		System.err.printf("Player %d control water %f, land %f\n", water[i], soil[i]);
+		}
+	}
     }
-
+   
     void play() {
        /* while (tick <= MAX_TICKS) {
             if (endOfGame()) break;
@@ -755,7 +766,8 @@ public class Outpost
         String group1 = null;
         String group2 = null;
         String group3 = null;
-
+        
+        
         if (args.length > 0)
             map = args[0];
         if (args.length > 1)
@@ -774,7 +786,8 @@ public class Outpost
         	group2 = args[7];
         if (args.length>8)
         	group3 = args[8];
-
+        if (args.length>9)
+        	nrounds = Integer.parseInt(args[9]);
         // load players
         
         players[0] = loadPlayer(group0, 0);

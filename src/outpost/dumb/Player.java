@@ -7,7 +7,8 @@ import outpost.sim.Point;
 import outpost.sim.movePair;
 
 public class Player extends outpost.sim.Player {
-
+	 static int size =100;
+	static Point[] grid = new Point[size*size];
 	
     public Player(int id_in) {
 		super(id_in);
@@ -27,143 +28,49 @@ public class Player extends outpost.sim.Player {
     // my position: dogs[id-1]
 
     
-   static int size =10;
+  
     static Random random = new Random();
     
 	//public movePair move(ArrayList<ArrayList<Pair>> king_outpostlist, int noutpost, Point[] grid) {
-    public movePair move(ArrayList<ArrayList<Pair>> king_outpostlist, int noutpost, Point[] gridin) {
-    	Point[] grid = new Point[100*100];
+    public ArrayList<movePair> move(ArrayList<ArrayList<Pair>> king_outpostlist, int noutpost, Point[] gridin){
+    	ArrayList<movePair> nextlist = new ArrayList<movePair>();
+    	
     	for (int i=0; i<gridin.length; i++) {
     		grid[i]=new Point(gridin[i]);
     	}
-    	System.out.println(grid[5*size+5].water);
     	ArrayList<Pair> prarr = new ArrayList<Pair>();
     	prarr = king_outpostlist.get(this.id);
-    	Point target = null;
-    	boolean hastarget = false;
-    	ArrayList<Point> waterList = orderWater(grid);
-    	System.out.printf("waterList size is %d", waterList.size());
-    	int moveid = 0;
-		Pair movepair = null;
-    //System.out.printf("paarr size and noutpost size is %d, %d", prarr.size(), noutpost);
-		if (prarr.size()>noutpost) {
-			movePair mpr = new movePair(0, new Pair(0,0), true);
-			return mpr;
-		}
-		else {
-			if (!hastarget) {
-			for (int i=0; i<waterList.size(); i++) {
-				if (waterList.get(i).ownerlist.size()==0) {
-				//	target = PairtoPoint(surround(PointtoPair(waterList.get(i))).get(0));
-					System.out.println("haha, we are here");
-					break;
-				}
-			}
-			hastarget = true;
-			moveid = prarr.size()-1;
-			movepair = new Pair(prarr.get(prarr.size()-1).x, prarr.get(prarr.size()-1).y);
-			if (movepair.x<target.x) {
-				movePair mpr = new movePair(moveid, new Pair(movepair.x+1, movepair.y), false);
-				return mpr;
-			}
-			if (movepair.x>target.x) {
-				movePair mpr = new movePair(moveid, new Pair(movepair.x-1, movepair.y), false);
-				return mpr;
-			}
-			if (movepair.y<target.y) {
-				movePair mpr = new movePair(moveid, new Pair(movepair.x, movepair.y+1), false);
-				return mpr;
-			}
-			if (movepair.y>target.y){
-				movePair mpr = new movePair(moveid, new Pair(movepair.x, movepair.y-1), false);
-				return mpr;
-			}
-			else {
-				if (king_outpostlist.size()-1>moveid) {
-					hastarget = false;
-				}
-				movePair mpr = new movePair(moveid, new Pair(movepair.x, movepair.y), false);
-				return mpr;
-			}
-			}
-			else {
-			if (movepair.x<target.x) {
-				movePair mpr = new movePair(moveid, new Pair(movepair.x+1, movepair.y), false);
-				return mpr;
-			}
-			if (movepair.x>target.x) {
-				movePair mpr = new movePair(moveid, new Pair(movepair.x-1, movepair.y), false);
-				return mpr;
-			}
-			if (movepair.y<target.y) {
-				movePair mpr = new movePair(moveid, new Pair(movepair.x, movepair.y+1), false);
-				return mpr;
-			}
-			if (movepair.y>target.y){
-				movePair mpr = new movePair(moveid, new Pair(movepair.x, movepair.y-1), false);
-				return mpr;
-			}
-			else {
-				if (king_outpostlist.size()-1>moveid) {
-					hastarget = false;
-				}
-				movePair mpr = new movePair(moveid, new Pair(movepair.x, movepair.y), false);
-				return mpr;
-			}
-			}
-	}
-    
-}
-    static ArrayList<Point> orderWater(Point[] gridin) {
-    	Point[] grid = new Point[100*100];
-    	for (int i=0; i<gridin.length; i++) {
-    		grid[i]=new Point(gridin[i]);
-    	}
-    	Pair cornel = null;
-    	boolean edge = false;
-    	System.out.println("orderwater");
-    	if (id==0) {
-    		cornel = new Pair(0,0);
-    	}
-    	if (id==1) {
-    		cornel = new Pair(size,0);
-    	}
-    	if (id==2) {
-    		cornel = new Pair(size,size);
-    	}
-    	if (id==3) {
-    		cornel = new Pair(0,size);
-    	}
-    	
-    	ArrayList<Point> waterList= new ArrayList<Point>();
-    	for (int i=0; i<size; i++) {
-    		for (int j=0; j<size; j++) {
-    		//	System.out.println(grid[i*size+j].water);
-    			if (grid[i*size+j].water) {
-    				System.out.println("we are here, water");
-    				for (int f=0; f<surround(PointtoPair(grid[i*size+j])).size(); f++) {
-    		//			if (!PairtoPoint(surround(PointtoPair(grid[i*size+j])).get(f)).water) {
-    						edge = true; 
-    						System.out.println("we are here");
-    			//		}
-    				}
-    				if (edge) {
-    				//	grid[i*size+j].distance = distance(PairtoPoint(cornel), grid[i*size+j]);
-    					waterList.add(grid[i*size+j]);
-    					edge = false;
-    				}
-    			}
+    	for (int j =0; j<prarr.size()-1; j++) {
+    		ArrayList<Pair> positions = new ArrayList<Pair>();
+    		positions = surround(prarr.get(j));
+    		for (int f=0; f<positions.size(); f++) {
+    		if (!PairtoPoint(positions.get(f)).water && positions.get(f).x>0 && positions.get(f).y>0 && positions.get(f).x<size && positions.get(f).y<size) {
+    			movePair next = new movePair(j, positions.get(f), true);
+    			nextlist.add(next);
+    			break;
+    		}
     		}
     	}
-    	
-    Collections.sort(waterList, new Comparator<Point>() {
-       
-        public int compare(Point o1, Point o2) {
-        	return Double.compare(o1.distance, o2.distance);
-        }
-    });
-    return waterList;
+    	if (prarr.size()>noutpost) {
+			movePair mpr = new movePair(0, new Pair(0,0), true);
+			nextlist.add(mpr);
+		}
+    	else {
+    		ArrayList<Pair> positions = new ArrayList<Pair>();
+    		positions = surround(prarr.get(prarr.size()-1));
+    		for (int f=0; f<positions.size(); f++) {
+    		if (!PairtoPoint(positions.get(f)).water) {
+    			movePair next = new movePair(prarr.size()-1, positions.get(f), true);
+    			nextlist.add(next);
+    			break;
+    		}
+    		
+    	}
+    	}
+    	return nextlist;
+    
     }
+    
     
     static ArrayList<Pair> surround(Pair start) {
    // 	System.out.printf("start is (%d, %d)", start.x, start.y);
@@ -205,7 +112,9 @@ public class Player extends outpost.sim.Player {
     	return prlist;
     }
     
-    
+    static Point PairtoPoint(Pair pr) {
+    	return grid[pr.x*size+pr.y];
+    }
     static Pair PointtoPair(Point pt) {
     	return new Pair(pt.x, pt.y);
     }
