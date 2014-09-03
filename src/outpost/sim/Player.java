@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import outpost.sim.Point;
 
 public abstract class Player {
-    public static int id; 
+    public  int id; 
 
     public Pair[] outposts;
     

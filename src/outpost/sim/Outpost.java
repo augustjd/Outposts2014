@@ -428,7 +428,7 @@ public class Outpost
     	return new Pair(pt.x, pt.y);
     }
 
-    boolean validateMove(movePair mpr, int id) {
+   /* boolean validateMove(movePair mpr, int id) {
     	reach = false;
     	if (king_outpostlist.get(id).size()>noutpost[id] && (tick%10==1)) {
     		//System.out.printf("%d 's king_outpostlist size is %d, noutpost size %d", id, king_outpostlist.get(id).size(), noutpost[id]);
@@ -468,7 +468,7 @@ public class Outpost
     	return reach;
     }
 
-    
+    */
     
     static void supplyline (Pair pr, Pair target, int id) {
     	if (target.equals(pr)) {
@@ -632,7 +632,7 @@ public class Outpost
         	//next = players[d].move(king_outpostlist, noutpost[d], grid);
         	//System.out.printf("Player %d is moving (%d, %d) to (%d, %d)\n", d, king_outpostlist.get(d).get(next.id).x, king_outpostlist.get(d).get(next.id).y, next.pr.x, next.pr.y);
         	// validate player move
-            if (validateMove(next, d)) {
+       //     if (validateMove(next, d)) {
             	if (next.delete) {
             		king_outpostlist.get(d).remove(next.id);
             	}
@@ -642,10 +642,10 @@ public class Outpost
             	//	System.out.printf("player %d 's king_outpostlist %d 's outpost is (%d, %d)\n", d, next.id, tmp.x, tmp.y);
             	}
             	updatemap();
-            }
-            else {
-            	System.out.println("valid didn't pass...");
-            }
+         //   }
+           // else {
+            //	System.out.println("valid didn't pass...");
+            //}
         	}
             if (tick % 10 == 0){
             	calculateres();

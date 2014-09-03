@@ -15,4 +15,8 @@ public class movePair {
         this.pr = pr_in;
         this.delete = deletein;
     }
+    
+    public void printmovePair() {
+    	System.out.printf("(%d, %b, (%d, %d))", id, delete, pr.x, pr.y);
+    }
 }

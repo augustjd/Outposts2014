@@ -34,7 +34,7 @@ public class Player extends outpost.sim.Player {
 	//public movePair move(ArrayList<ArrayList<Pair>> king_outpostlist, int noutpost, Point[] grid) {
     public ArrayList<movePair> move(ArrayList<ArrayList<Pair>> king_outpostlist, int noutpost, Point[] gridin){
     	ArrayList<movePair> nextlist = new ArrayList<movePair>();
-    	
+    	//System.out.printf("Player %d\n", this.id);
     	for (int i=0; i<gridin.length; i++) {
     		grid[i]=new Point(gridin[i]);
     	}
@@ -43,30 +43,45 @@ public class Player extends outpost.sim.Player {
     	for (int j =0; j<prarr.size()-1; j++) {
     		ArrayList<Pair> positions = new ArrayList<Pair>();
     		positions = surround(prarr.get(j));
-    		for (int f=0; f<positions.size(); f++) {
-    		if (!PairtoPoint(positions.get(f)).water && positions.get(f).x>0 && positions.get(f).y>0 && positions.get(f).x<size && positions.get(f).y<size) {
-    			movePair next = new movePair(j, positions.get(f), true);
+    		boolean gotit=false;
+    		while (!gotit) {
+    			Random random = new Random();
+				int theta = random.nextInt(positions.size());
+				//System.out.println(theta);
+    		if (!PairtoPoint(positions.get(theta)).water && positions.get(theta).x>0 && positions.get(theta).y>0 && positions.get(theta).x<size && positions.get(theta).y<size) {
+    			movePair next = new movePair(j, positions.get(theta), false);
     			nextlist.add(next);
+    			//next.printmovePair();
+    			gotit = true;
     			break;
     		}
     		}
     	}
     	if (prarr.size()>noutpost) {
-			movePair mpr = new movePair(0, new Pair(0,0), true);
+			movePair mpr = new movePair(prarr.size()-1, new Pair(0,0), true);
 			nextlist.add(mpr);
+			//mpr.printmovePair();
 		}
     	else {
     		ArrayList<Pair> positions = new ArrayList<Pair>();
     		positions = surround(prarr.get(prarr.size()-1));
-    		for (int f=0; f<positions.size(); f++) {
-    		if (!PairtoPoint(positions.get(f)).water) {
-    			movePair next = new movePair(prarr.size()-1, positions.get(f), true);
+    		boolean gotit=false;
+    		while (!gotit) {
+    			Random random = new Random();
+				int theta = random.nextInt(positions.size());
+				//System.out.println(theta);
+    		if (!PairtoPoint(positions.get(theta)).water && positions.get(theta).x>=0 && positions.get(theta).y>=0 && positions.get(theta).x<size && positions.get(theta).y<size) {
+    			movePair next = new movePair(prarr.size()-1, positions.get(theta), false);
     			nextlist.add(next);
+    			//next.printmovePair();
+    			gotit = true;
     			break;
+    		}
     		}
     		
     	}
-    	}
+    	
+    	
     	return nextlist;
     
     }
