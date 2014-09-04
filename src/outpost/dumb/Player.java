@@ -30,6 +30,11 @@ public class Player extends outpost.sim.Player {
     
   
     static Random random = new Random();
+    public int delete(ArrayList<ArrayList<Pair>> king_outpostlist, Point[] gridin) {
+    	System.out.println("haha, we are trying to delete a player");
+    	int del = random.nextInt(king_outpostlist.get(id).size());
+    	return del;
+    }
     
 	//public movePair move(ArrayList<ArrayList<Pair>> king_outpostlist, int noutpost, Point[] grid) {
     public ArrayList<movePair> move(ArrayList<ArrayList<Pair>> king_outpostlist, int noutpost, Point[] gridin){

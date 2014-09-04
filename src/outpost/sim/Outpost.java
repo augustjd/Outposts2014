@@ -56,7 +56,7 @@ public class Outpost
 	static int[] noutpost = new int[4];
 	static int nrounds;
 	
-	ArrayList<ArrayList<Pair>> king_outpostlist = new ArrayList<ArrayList<Pair>>();
+	static ArrayList<ArrayList<Pair>> king_outpostlist = new ArrayList<ArrayList<Pair>>();
     
 	// list files below a certain directory
 	// can filter those having a specific extension constraint
@@ -286,6 +286,29 @@ public class Outpost
             		g2.setPaint(Color.orange);
             	}
             	g2.fill(new Rectangle2D.Double(ox+x_in*i,oy+y_in*j,x_in,y_in));
+            	if (grid[i*size+j].ownerlist.size()>0) {
+            	//	System.out.println("this is owned by player 0");
+            		if (grid[i*size+j].ownerlist.get(0).x==0)  {
+            			
+            			g2.setPaint(Color.white);
+            			g2.fill(new Rectangle2D.Double(ox+x_in/4+x_in*i,oy+x_in/4+y_in*j,x_in/2,y_in/2));
+            		}
+            		if (grid[i*size+j].ownerlist.get(0).x==1)  {
+            			
+            			g2.setPaint(Color.MAGENTA);
+            			g2.fill(new Rectangle2D.Double(ox+x_in/4+x_in*i,oy+x_in/4+y_in*j,x_in/2,y_in/2));
+            		}
+            		if (grid[i*size+j].ownerlist.get(0).x==2)  {
+            			
+            			g2.setPaint(Color.BLACK);
+            			g2.fill(new Rectangle2D.Double(ox+x_in/4+x_in*i,oy+x_in/4+y_in*j,x_in/2,y_in/2));
+            		}
+            		if (grid[i*size+j].ownerlist.get(0).x==3)  {
+            			
+            			g2.setPaint(Color.RED);
+            			g2.fill(new Rectangle2D.Double(ox+x_in/4+x_in*i,oy+x_in/4+y_in*j,x_in/2,y_in/2));
+            		}
+            	}
             }
             
             }
@@ -367,6 +390,7 @@ public class Outpost
 
 
     void calculateres() {
+    	System.out.println("calculate resouce");
     	for (int i=0; i<4; i++) {
     		water[i] =0.0;
     		soil[i] =0.0;
@@ -397,14 +421,22 @@ public class Outpost
     		noutpost[i] = (int) Math.min(soil[i]/L, water[i]/W)+1;
     		if (noutpost[i]>king_outpostlist.get(i).size()) {
     			//System.out.printf("After the calculation, the number of outpost for %d king should increase", i);
-            	if (i==0)
+            	if (i==0) {
             	king_outpostlist.get(i).add(new Pair(0,0));
-            	if (i==1)
+            	System.out.println("the first player got a new outpost");
+            	}
+            	if (i==1) {
             		king_outpostlist.get(i).add(new Pair(size-1, 0));
-            	if (i==2)
+            		System.out.println("the second player got a new outpost");
+            	}
+            	if (i==2) {
             		king_outpostlist.get(i).add(new Pair(size-1, size-1));
-            	if (i==3)
+            		System.out.println("the third player got a new outpost");
+            	}
+            	if (i==3) {
             		king_outpostlist.get(i).add(new Pair(0,size-1));
+            		System.out.println("the fourth player got a new outpost");
+            	}
     		}
     		
     	}
@@ -428,26 +460,28 @@ public class Outpost
     	return new Pair(pt.x, pt.y);
     }
 
-   /* boolean validateMove(movePair mpr, int id) {
-    	reach = false;
-    	if (king_outpostlist.get(id).size()>noutpost[id] && (tick%10==1)) {
-    		//System.out.printf("%d 's king_outpostlist size is %d, noutpost size %d", id, king_outpostlist.get(id).size(), noutpost[id]);
-    		if (mpr.delete && mpr.id < king_outpostlist.get(id).size())
-    			return true;
-    	}
-    	else if (mpr.id<king_outpostlist.get(id).size()){
+    void validateMove(ArrayList<movePair> nextlist, int id) {
+    	
+    	//reach = false;
+    	for (int i=0; i<nextlist.size(); i++) {
+    		movePair mpr = nextlist.get(i);
+    	if (mpr.id<king_outpostlist.get(id).size()){
     		Pair current = king_outpostlist.get(id).get(mpr.id);
     		Pair next = mpr.pr;
-    		boolean has = false;
-    		for (int i=0; i<surroundpr(current).size(); i++) {
-    			if (surroundpr(current).get(i).equals(next)) {
-    				has = true;
+    		
+    		for (int j=0; j<surroundpr(current).size(); j++) {
+    			if (surroundpr(current).get(j).equals(next)) {
+    				if (!PairtoPoint(next).water) {
+    					Pair tmp = new Pair(next.x, next.y);
+                		king_outpostlist.get(id).set((mpr.id), tmp);
+    				}
     			}
     		}
-    		//System.out.printf("surrand is %b\n",has);
-    		if (has && !PairtoPoint(next).water ) {
-        Pair target = null ;
-        
+    		
+    	}
+    	}
+    	
+    	Pair target = null;
         if (id ==0) {
         	target = new Pair(0,0);
         }
@@ -461,58 +495,79 @@ public class Outpost
         	target = new Pair(0,size-1);
         }
         searchlist.clear();
-        supplyline(next, target, id);
+        supplyline(target, id);
         
+        for (int j=0; j<king_outpostlist.get(id).size(); j++){
+        boolean disqual = true;
+        for (int i=0; i<searchlist.size(); i++) {
+        	if (searchlist.get(i).equals(king_outpostlist.get(id).get(j))) {
+        		disqual = false;
+        		break;
+        	}
+        }
+        if (disqual) {
+        	king_outpostlist.get(id).remove(j);
+        	System.out.printf("sorry that we have to disqualify one outpost of Player %d\n", id);
+        }
+        }
+    	
+    	
+    	if (king_outpostlist.get(id).size()>noutpost[id] && (tick%10==1)) {
+    		//System.out.printf("%d 's king_outpostlist size is %d, noutpost size %d", id, king_outpostlist.get(id).size(), noutpost[id]);
+    		int del_no = players[id].delete(king_outpostlist, grid);
+    		king_outpostlist.get(id).remove(del_no);
     	}
-    	}
-    	return reach;
+    	
+    	
     }
 
-    */
+   static boolean hascontained(ArrayList<Pair> list, Pair pr) {
+	   for (int j=0; j<list.size(); j++){
+		   
+           	if (list.get(j).equals(pr)) {
+           		return true;
+           	}
+           }
+   		return false;
+   }
     
-    static void supplyline (Pair pr, Pair target, int id) {
-    	if (target.equals(pr)) {
-			reach =true;
-		} 
-    	else if (!reach){
+    static void supplyline (Pair target, int id) {
+    	boolean stop = true;
+    	for (int j=0; j<king_outpostlist.get(id).size(); j++){
+    		if (!hascontained(searchlist, king_outpostlist.get(id).get(j)))
+    			stop = false;
+            }
+    	if (!stop) {
+    	
     	int player;
     	player = id;
     	Point source = new Point();
     	ArrayList<Pair> surlist = new ArrayList<Pair>();
     	Point end = new Point();
     	//search_depth++;
-    	Pair pr_tmp = new Pair(pr);
-    	source = grid[pr_tmp.x*size+pr_tmp.y];
     	
-    	if (!source.water) {
-    		boolean has = false;
-    		for (int i=0; i<searchlist.size(); i++) {
-    			if (searchlist.get(i).equals(pr)) {
-    				has = true;
-    			}
-    		}
-    	if (has) {
-    	}
-    	else {
-    	searchlist.add(PointtoPair(source));
+    	source = grid[target.x*size+target.y];
+    	searchlist.add(target);
     	surlist = surround(PointtoPair(source));
     	for (int i=0; i<surlist.size(); i++) {
     		if (!PairtoPoint(surlist.get(i)).water && (PairtoPoint(surlist.get(i)).ownerlist.size() ==0 || (PairtoPoint(surlist.get(i)).ownerlist.size()== 1 && PairtoPoint(surlist.get(i)).ownerlist.get(0).x==player))){
     			Pair pt = new Pair(surlist.get(i).x, surlist.get(i).y);
-    		}
-    				if (searchlist.contains(surlist.get(i))) {
-    					
-    				}
-    				else{
-    				Pair tmp = new Pair(surlist.get(i).x,surlist.get(i).y);
-    				supplyline(tmp, target, id);
-    				}
+    			boolean has = false;
+    			if (!grid[pt.x*size+pt.y].water) {
+    	    		for (int j=0; j<searchlist.size(); j++) {
+    	    			if (searchlist.get(j).equals(pt)) {
+    	    				has = true;
+    	    			}
+    	    		}
+    	    		if (!has) {
+        				supplyline(pt, id);
+    	    		}
+    			}	
     			}
-    		}
     	}
     	}
-   
     }
+    	
     
     
     static ArrayList<Pair> surround(Pair start) {
@@ -620,7 +675,10 @@ public class Outpost
        tick++;        
 
         // move the player dogs
-         
+       if (tick % 10 == 0 && tick !=0){
+       	calculateres();
+       	//updatemap();
+       }
        
 	for (int d=0; d<4; d++) {
         try {
@@ -633,24 +691,21 @@ public class Outpost
         	//System.out.printf("Player %d is moving (%d, %d) to (%d, %d)\n", d, king_outpostlist.get(d).get(next.id).x, king_outpostlist.get(d).get(next.id).y, next.pr.x, next.pr.y);
         	// validate player move
        //     if (validateMove(next, d)) {
-            	if (next.delete) {
+        	validateMove(nextlist, d);
+            	/*if (next.delete) {
             		king_outpostlist.get(d).remove(next.id);
             	}
             	else {
             		Pair tmp = new Pair(next.pr.x, next.pr.y);
             		king_outpostlist.get(d).set((next.id), tmp);
-            	//	System.out.printf("player %d 's king_outpostlist %d 's outpost is (%d, %d)\n", d, next.id, tmp.x, tmp.y);
-            	}
+            	}*/
             	updatemap();
          //   }
            // else {
             //	System.out.println("valid didn't pass...");
             //}
         	}
-            if (tick % 10 == 0){
-            	calculateres();
-            	//updatemap();
-            }
+            
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println("[ERROR] Player throws exception!!!!");
