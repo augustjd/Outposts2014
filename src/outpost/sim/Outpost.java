@@ -381,11 +381,23 @@ public class Outpost
         			double d = distance(PairtoPoint(king_outpostlist.get(j).get(f)), pr);
         			if (d == mindist) {
         				Pair tmp = new Pair(j, f);
+        				if (pr.ownerlist.size()==0) {
         				pr.ownerlist.add(tmp);
+        				}
+        				else if (!thesameowner(pr, tmp)) {
+        					pr.ownerlist.add(tmp);
+        				}
         			}
         		}
         	}
         }
+    }
+    boolean thesameowner(Point pt, Pair tmp) {
+    	for (int i=0; i<pt.ownerlist.size(); i++){
+    		if (pt.ownerlist.get(i).x==tmp.x)
+    			return true;
+    	}
+    	return false;
     }
 
 
@@ -496,7 +508,7 @@ public class Outpost
         }
         searchlist.clear();
         supplyline(target, id);
-        
+        ArrayList<Integer> removeList = new ArrayList<Integer>();
         for (int j=0; j<king_outpostlist.get(id).size(); j++){
         boolean disqual = true;
         for (int i=0; i<searchlist.size(); i++) {
@@ -506,11 +518,20 @@ public class Outpost
         	}
         }
         if (disqual) {
-        	king_outpostlist.get(id).remove(j);
-        	System.out.printf("sorry that we have to disqualify one outpost of Player %d\n", id);
+        	//for (int i=0; i<searchlist.size(); i++) {
+            	System.out.printf("searchlist size is %d", searchlist.size());
+            //}
+        	System.out.printf("sorry that we have to disqualify %d outpost (%d, %d) of Player %d\n", j, king_outpostlist.get(id).get(j).x, king_outpostlist.get(id).get(j).y, id);
+        	removeList.add(j);
+        	
         }
         }
-    	
+        int counter = 0;
+        for (int i=0; i<removeList.size(); i++) {
+        king_outpostlist.get(id).remove(removeList.get(i)-counter);
+        counter = counter+1;
+        }
+        //System.out.printf("counter is %d\n", counter);
     	
     	if (king_outpostlist.get(id).size()>noutpost[id] && (tick%10==1)) {
     		//System.out.printf("%d 's king_outpostlist size is %d, noutpost size %d", id, king_outpostlist.get(id).size(), noutpost[id]);
@@ -532,23 +553,27 @@ public class Outpost
    }
     
     static void supplyline (Pair target, int id) {
+    	//System.out.printf("target is (%d, %d)\n", target.x, target.y);
     	boolean stop = true;
-    	for (int j=0; j<king_outpostlist.get(id).size(); j++){
-    		if (!hascontained(searchlist, king_outpostlist.get(id).get(j)))
-    			stop = false;
-            }
-    	if (!stop) {
-    	
     	int player;
     	player = id;
     	Point source = new Point();
     	ArrayList<Pair> surlist = new ArrayList<Pair>();
-    	Point end = new Point();
-    	//search_depth++;
     	
+    	for (int j=0; j<king_outpostlist.get(id).size(); j++){
+    		if (!hascontained(searchlist, king_outpostlist.get(id).get(j))) {
+    			stop = false;
+    			break;
+    		}
+            }
+    	//if (stop) {
+    		//System.out.printf("we found all outposts in the safe area for player %d\n", id);
+    	//}
+    	if (!stop & !hascontained(searchlist, target)) {
+    	//search_depth++;
     	source = grid[target.x*size+target.y];
     	searchlist.add(target);
-    	surlist = surround(PointtoPair(source));
+    	surlist = surround(target);
     	for (int i=0; i<surlist.size(); i++) {
     		if (!PairtoPoint(surlist.get(i)).water && (PairtoPoint(surlist.get(i)).ownerlist.size() ==0 || (PairtoPoint(surlist.get(i)).ownerlist.size()== 1 && PairtoPoint(surlist.get(i)).ownerlist.get(0).x==player))){
     			Pair pt = new Pair(surlist.get(i).x, surlist.get(i).y);
@@ -619,7 +644,7 @@ public class Outpost
     	    			}
     	    		}
     	    		if (i==1) {
-    	    			if (start.x<99) {
+    	    			if (start.x<size-1) {
     	    				Pair tmp = new Pair(start.x+1, start.y);
         	    			prlist.add(tmp);
     	    			}
@@ -631,7 +656,7 @@ public class Outpost
     	    			}
     	    		}
     	    		if (i==3) {
-    	    			if (start.y<99 ) {
+    	    			if (start.y<size-1 ) {
     	    				Pair tmp = new Pair(start.x, start.y+1);
         	    			prlist.add(tmp);
     	    			}

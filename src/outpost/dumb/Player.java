@@ -62,13 +62,19 @@ public class Player extends outpost.sim.Player {
     			//Random random = new Random();
 				//int theta = random.nextInt(positions.size());
 				//System.out.println(theta);
-    		if (!PairtoPoint(positions.get(theta[j])).water && positions.get(theta[j]).x>0 && positions.get(theta[j]).y>0 && positions.get(theta[j]).x<size && positions.get(theta[j]).y<size) {
+    		//if (!PairtoPoint(positions.get(theta[j])).water && positions.get(theta[j]).x>0 && positions.get(theta[j]).y>0 && positions.get(theta[j]).x<size && positions.get(theta[j]).y<size) {
+    			if (theta[j]<positions.size()){
+        			if (positions.get(theta[j]).x>=0 && positions.get(theta[j]).y>=0 && positions.get(theta[j]).x<size && positions.get(theta[j]).y<size) {
+        		
+        				if (!PairtoPoint(positions.get(theta[j])).water) {
     			movePair next = new movePair(j, positions.get(theta[j]), false);
     			nextlist.add(next);
     			//next.printmovePair();
     			gotit = true;
     			break;
     		}
+        			}
+    			}
     		//System.out.println("we need to change the direction???");
     		theta[j] = random.nextInt(positions.size());
     		}
