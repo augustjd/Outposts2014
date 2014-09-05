@@ -357,7 +357,7 @@ public class Outpost
 
 
     void updatePoint(Point pr) {
-    
+    	pr.ownerlist.clear();
         double mindist = Math.sqrt(size*size);
         
         //ArrayList<Pair> ownerlist = new ArrayList<Pair>();
@@ -375,7 +375,7 @@ public class Outpost
         if (mindist < r_distance){
         	//ownerlist = pr.ownerlist;
 			//ownerlist.clear();
-        	pr.ownerlist.clear();
+        	//pr.ownerlist.clear();
         	for (int j =0 ; j<king_outpostlist.size(); j++) {
         		for (int f =0; f<king_outpostlist.get(j).size(); f++) {
         			double d = distance(PairtoPoint(king_outpostlist.get(j).get(f)), pr);
@@ -846,9 +846,13 @@ public class Outpost
         // load players
         
         players[0] = loadPlayer(group0, 0);
+        players[0].init();
         players[1] = loadPlayer(group1, 1);
+        players[1].init();
         players[2] = loadPlayer(group2, 2);
+        players[2].init();
         players[3] = loadPlayer(group3, 3);
+        players[3].init();
         
         // create game
         Outpost game = new Outpost();
