@@ -112,7 +112,7 @@ public class Board {
         return tiles[row][col] == TileType.Land;
     }
     public boolean isLand(Point p) {
-        if (p.getY() < 0 || p.getY() >= 100 || p.getX() < 0 || p.getY() >= 100) {
+        if (!Rectangle.BOARD_RECTANGLE.contains(p)) {
             return false;
         }
         return tiles[p.getY()][p.getX()] == TileType.Land;

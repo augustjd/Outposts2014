@@ -11,6 +11,46 @@ public class Game {
         return commanders[my_id].getOutposts();
     }
 
+
+    List<Outpost> opponents = null;
+    public List<Outpost> getOpposingOutposts() {
+        if (opponents == null) {
+            opponents = new ArrayList<Outpost>();
+            for (int i = 0; i < commanders.length; i++) {
+                if (i == my_id) continue;
+                opponents.addAll(commanders[i].getOutposts());
+            }
+        }
+
+        return opponents;
+    }
+
+    Map<Point, Set<Outpost>> owners_by_point = null;
+
+    public Map<Point, Set<Outpost>> getOwnersByPoint() {
+        if (owners_by_point == null) {
+            owners_by_point = new HashMap<Point, Set<Outpost>>();
+            List<Outpost> mine = getMyOutposts();
+            for (int i = 0; i < Board.BOARD_SIZE; i++) {
+                for (int j = 0; j < Board.BOARD_SIZE; j++) {
+
+                    Point p = new Point(i,j);
+                    for (Outpost o : mine) {
+                        if (o.distanceTo(p) < this.radius) {
+                            if (!owners_by_point.containsKey(p)) {
+                                owners_by_point.put(p, new HashSet<Outpost>());
+                            }
+                            owners_by_point.get(p).add(o);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        return owners_by_point;
+    }
+
     public Commander getMe() { return commanders[my_id]; };
 
     int my_id;
@@ -30,6 +70,7 @@ public class Game {
     }
 
     public void loadOutposts(ArrayList<ArrayList<outpost.sim.Pair>> outposts) {
+        opponents = null;
         Point[] corners = Rectangle.BOARD_RECTANGLE.getCorners();
         commanders = new Commander[4];
         for (int i = 0; i < 4; i++) {

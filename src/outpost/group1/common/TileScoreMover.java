@@ -6,18 +6,53 @@ public class TileScoreMover extends ScoreMover {
     public static Random rand = new Random();
 
     public double scoreTile(Point p, Game g, Outpost o) {
-        return 0.3  * distanceScore(p, g) 
-             + 10.0 * avoidEdgesScore(p, g) 
-             + 10.0  * avoidNeighborsScore(p, g, o);
+        return 40.0  * distanceScore(p, g, o) 
+             + 0.0  * avoidEdgesScore(p, g) 
+             + 1.0  * avoidNeighborsScore(p, g, o)
+             + 5.0  * waterScore(p, g, o)
+             + 4.0  * landScore(p, g, o)
+             + 3.0  * safetyScore(p, g);
     }
 
     public static final int TARGET_DISTANCE = Board.BOARD_SIZE / 2;
-    public double distanceScore(Point p, Game g) {
-        Commander me = g.getMe();
-        int distance = p.distanceTo(me.getCorner());
 
-        return 100*TARGET_DISTANCE - Math.pow(TARGET_DISTANCE - distance, 2);
+    public static final int GUARDIAN_DISTANCE = 20;
+    public static final int GUARDIAN_COUNT = 5;
+    public double distanceScore(Point p, Game g, Outpost o) {
+        Commander me = g.getMe();
+        double dist = p.distanceTo(me.getCorner());
+        double result = dist;
+
+        int outposts_count = me.getOutposts().size();
+        if (outposts_count > 1.5 * GUARDIAN_COUNT && 
+            o.getId() >= outposts_count - GUARDIAN_COUNT && 
+            dist > GUARDIAN_DISTANCE) {
+
+            return GUARDIAN_DISTANCE-dist;
+        }
+        return result;
     }
+
+    double SAFETY_RADIUS = 30;
+    public double safetyScore(Point p, Game g) {
+        List<Outpost> opposing_outposts = g.getOpposingOutposts();
+        double sum = 0;
+        for (Outpost o : opposing_outposts) {
+            double dist = p.distanceTo(o.getPosition());
+            if (dist < SAFETY_RADIUS) {
+                sum -= dist;
+            }
+        } 
+        return sum;
+    }
+
+    /*
+    public double falloff(double x, double y_intercept, double x_intercept) {
+        double b =  - y_intercept / x_intercept;
+
+        return (x - x_intercept) * (
+    }
+    */
 
     public double avoidEdgesScore(Point p, Game g) {
         Point closestEdge = p.closestTo(Rectangle.BOARD_RECTANGLE.getCornersList());
@@ -42,16 +77,68 @@ public class TileScoreMover extends ScoreMover {
     public double avoidNeighborsScore(Point p, Game g, Outpost o) {
         List<Point> neighbor_positions = new ArrayList<Point>();
 
+        double sum = 0;
         for (Outpost other : g.getMe().getOutposts()) {
-            if (other.getId() == o.getId()) continue;
+            if (other == o) continue;
+            int dist = p.distanceTo(other.getPosition());
 
-            neighbor_positions.add(other.getPosition());
+            if (dist < g.radius / 2.0) {
+                sum -= 1000.0;
+                if (dist == 0) {
+                    sum = Double.NEGATIVE_INFINITY;
+                    return sum;
+                }
+            } else if (dist > g.radius && dist < 1.5 * g.radius) {
+                sum += 0.0;
+            }
         }
 
-        Point closestNeighbor = p.closestTo(neighbor_positions);
+        return sum;
+    }
 
-        if (closestNeighbor == null) return 0.0;
-        
-        return targetDistanceScore(p, closestNeighbor, g.radius * 2, 20.0);
+    public double waterScore(Point p, Game g, Outpost o) {
+        Map<Point, Set<Outpost>> owners_by_point = g.getOwnersByPoint();
+
+        Point my_corner = g.getMe().getCorner();
+
+        int count = 0;
+        for (int i = p.getX() - g.radius; i <= p.getX() + g.radius; i++) {
+            for (int j = p.getY() - g.radius; j <= p.getY() + g.radius; j++) {
+                Point pt = new Point(i,j);
+                if (g.getBoard().isWater(pt)) {
+                    if (!owners_by_point.containsKey(pt)) {
+                        count += 1;//pt.distanceTo(my_corner);
+                    } else if (owners_by_point.get(pt).size() == 1 && 
+                               owners_by_point.get(pt).iterator().next().equals(o)) {
+                        count += 1;//pt.distanceTo(my_corner);
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
+    public double landScore(Point p, Game g, Outpost o) {
+        Map<Point, Set<Outpost>> owners_by_point = g.getOwnersByPoint();
+
+        Point my_corner = g.getMe().getCorner();
+
+        int count = 0;
+        for (int i = p.getX() - g.radius; i <= p.getX() + g.radius; i++) {
+            for (int j = p.getY() - g.radius; j <= p.getY() + g.radius; j++) {
+                Point pt = new Point(i,j);
+                if (g.getBoard().isLand(pt)) {
+                    if (!owners_by_point.containsKey(pt)) {
+                        count += 1;//pt.distanceTo(my_corner);
+                    } else if (owners_by_point.get(pt).size() == 1 && 
+                               owners_by_point.get(pt).iterator().next().equals(o)) {
+                        count += 1;//pt.distanceTo(my_corner);
+                    }
+                }
+            }
+        }
+
+        return count;
     }
 }

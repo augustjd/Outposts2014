@@ -22,6 +22,14 @@ public class Outpost {
 
     ScoreMover mover = new TileScoreMover();
 
+    public int distanceTo(Point p) {
+        return p.distanceTo(this.position);
+    }
+
+    public int distanceTo(Outpost o) {
+        return this.position.distanceTo(o.position);
+    }
+
     public Move getMove(Game game) {
         return mover.getMove(game, this);
     }

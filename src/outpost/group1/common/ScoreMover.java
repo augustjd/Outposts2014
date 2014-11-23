@@ -4,19 +4,29 @@ import java.util.*;
 
 public abstract class ScoreMover {
     public Move getMove(Game g, Outpost o) {
-        List<Point> valid_moves = g.getBoard().getLandNeighbors(o.getPosition());
-
-        // allow the player to stay in the same place.
-        valid_moves.add(o.getPosition());
+        int radius = 5;
+        List<Point> neighbors = Arrays.asList(
+                o.getPosition().add( radius, 0),
+                o.getPosition().add(-radius, 0),
+                o.getPosition().add( 0, radius),
+                o.getPosition().add( 0,-radius),
+                o.getPosition()
+                );
 
         Double best = null;
         Point destination = null;
-        for (Point p : valid_moves) {
-            double score = scoreTile(p, g, o);
-            if (best == null || score > best) {
-                best = score;
-                System.out.format("Outpost %s likes %s best with score %f\n", o, p, score);
-                destination = p;
+        for (Point p : neighbors) {
+            if (g.getBoard().isLand(p)) {
+                double score = scoreTile(p, g, o);
+                if (best == null || score > best) {
+                    best = score;
+                    Point offset = p.sub(o.getPosition());
+
+                    int dx = offset.getX() / radius;
+                    int dy = offset.getY() / radius;
+
+                    destination = o.getPosition().add(dx, dy);
+                }
             }
         }
 
